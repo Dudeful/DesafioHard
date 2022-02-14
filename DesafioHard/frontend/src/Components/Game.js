@@ -5,7 +5,7 @@ import Tower from "./Tower.js";
 import collision from "./Collision.js";
 import Enemy from "./Enemy.js";
 import Monster from "./Monster.js";
-import monsters from "./monsterStatus.js";
+import Player from "./Player.js";
 
 function cloneTower(tower) {
   const clone = new Tower();
@@ -25,11 +25,11 @@ class Game {
     this.canvas.width = 1360;
     this.canvas.height = 768;
 
-    this.money = 10000;
+    this.player = new Player();
 
     this.cellOver = null;
     this.runAnimationControll = true;
-    this.cellSize = 200;
+    this.cellSize = 194;
     this.cellGap = 5;
     this.gameGrid = [];
     this.controlBar = new ControlBar(this.canvas.width, this.cellSize);
@@ -37,8 +37,8 @@ class Game {
     this.mousePosition = {};
     this.towers = [];
     this.backgroundImage = new Image();
-    this.backgroundImage.src = "./assets/images/backgroundGame.png";
     this.enemys = [];
+    this.backgroundImage.src = "../assets/images/backgroundGame.png";
   }
   start() {
     window.addEventListener(
@@ -61,6 +61,13 @@ class Game {
     this.createGrid();
     this.catchMousePosition();
     this.spawnEnemy();
+  }
+  handleTowers() {
+    this.towers.forEach((tower) => {
+      tower.draw(this.ctx);
+      tower.update();
+      tower.handleProjectiles(this.ctx, this.canvas.width, this.cellSize);
+    });
   }
   resize() {
     let width = window.innerWidth;
@@ -177,8 +184,6 @@ class Game {
     });
     const onMouseMove = (e) => {
       //Desenha a celula que está por cima
-      console.log(this.mousePosition);
-      console.log(this.draggingElement);
       this.gameGrid.forEach((e) => {
         if (collision.pointRectCollisionDetection(this.mousePosition, e)) {
           this.cellOver = e;
